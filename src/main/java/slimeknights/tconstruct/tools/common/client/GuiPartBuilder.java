@@ -71,7 +71,6 @@ public class GuiPartBuilder extends GuiTinkerStation {
       }
 
       info = new GuiInfoPanel(this, container);
-      info.ySize = this.ySize;
       this.addModule(info);
     }
   }

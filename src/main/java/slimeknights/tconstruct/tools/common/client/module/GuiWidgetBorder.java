@@ -42,11 +42,6 @@ public class GuiWidgetBorder extends GuiWidget {
   }
 
   public void updateParent(GuiModule gui) {
-    gui.guiLeft -= borderLeft.w;
-    gui.guiTop -= borderTop.h;
-
-    gui.xSize += borderLeft.w + borderRight.w;
-    gui.ySize += borderTop.h + borderBottom.h;
   }
 
   @Override

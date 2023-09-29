@@ -42,7 +42,7 @@ public class GuiSideButtons extends GuiModule {
     button.y = guiTop + y;
 
     if(this.right) {
-      button.x += parent.xSize;
+	//      button.x += parent.xSize;
     }
 
     this.buttonList.add(button);

@@ -113,9 +113,8 @@ public class GuiSideInventory extends GuiModule {
     return firstSlotId <= slot.getSlotIndex() && lastSlotId > slot.getSlotIndex();
   }
 
-  @Override
   public boolean isMouseOverSlot(Slot slotIn, int mouseX, int mouseY) {
-    return super.isMouseOverSlot(slotIn, mouseX, mouseY) && shouldDrawSlot(slotIn);
+      return true;
   }
 
   public void updateSlotCount(int newSlotCount) {
