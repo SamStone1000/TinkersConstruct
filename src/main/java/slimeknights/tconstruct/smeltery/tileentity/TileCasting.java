@@ -200,8 +200,17 @@ public abstract class TileCasting extends TileTable implements ITickable, ISided
   /** Return the recipe for the current state, if one exists. Don't forget to fire the OnCasting event! */
   protected abstract ICastingRecipe findRecipe(ItemStack cast, Fluid fluid);
 
-  protected ICastingRecipe findRecipe(Fluid fluid) {
-    ICastingRecipe recipe = findRecipe(getStackInSlot(0), fluid);
+    protected ICastingRecipe findRecipe(Fluid fluid) {
+	ICastingRecipe recipe;
+	if (this.recipe != null) {
+	    if (!recipe.matches(getStackInSlot(0), fluid)) {
+		recipe = findRecipe(getStackInSlot(0), fluid);
+	    } else {
+		recipe = this.recipe;
+	    }
+	} else {
+	    recipe = findRecipe(getStackInSlot(0), fluid);
+	}
     if(TinkerCastingEvent.OnCasting.fire(recipe, this)) {
       return recipe;
     }
