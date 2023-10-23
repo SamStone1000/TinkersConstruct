@@ -203,7 +203,7 @@ public abstract class TileCasting extends TileTable implements ITickable, ISided
     protected ICastingRecipe findRecipe(Fluid fluid) {
 	ICastingRecipe recipe;
 	if (this.recipe != null) {
-	    if (!recipe.matches(getStackInSlot(0), fluid)) {
+	    if (!this.recipe.matches(getStackInSlot(0), fluid)) {
 		recipe = findRecipe(getStackInSlot(0), fluid);
 	    } else {
 		recipe = this.recipe;
