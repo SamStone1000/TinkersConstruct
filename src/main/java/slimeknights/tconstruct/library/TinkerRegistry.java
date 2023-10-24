@@ -525,7 +525,8 @@ public final class TinkerRegistry {
   private static List<MeltingRecipe> meltingRegistry = Lists.newLinkedList();
     private static Map<CastType, Map<Fluid, CastingRecipe>> tableCastRegistry = new HashMap<>();
     private static List<ICastingRecipe> badTableRegistry = Lists.newLinkedList();
-    private static List<ICastingRecipe> basinCastRegistry = Lists.newLinkedList();
+    private static Map<CastType, Map<Fluid, CastingRecipe>> basinCastRegistry = new HashMap<>();
+    private static List<ICastingRecipe> badBasinRegistry = Lists.newLinkedList();
     private static List<AlloyRecipe> alloyRegistry = Lists.newLinkedList();
     private static Map<FluidStack, Integer> smelteryFuels = Maps.newHashMap();
     private static Map<ResourceLocation, FluidStack> entityMeltingRegistry = Maps.newHashMap();
@@ -688,7 +689,26 @@ public final class TinkerRegistry {
 
     public static void registerBasinCasting(ICastingRecipe recipe) {
 	if(new TinkerRegisterEvent.BasinCastingRegisterEvent(recipe).fire()) {
-	    basinCastRegistry.add(recipe);
+	    if (recipe instanceof CastingRecipe) {
+		CastingRecipe casting = (CastingRecipe)recipe;
+		RecipeMatch rm = casting.cast;
+		List<ItemStack> inputs;
+		if (rm != null) {
+		    inputs = rm.getInputs();
+		} else {
+		    inputs = Collections.singletonList(ItemStack.EMPTY);
+		}
+		for (ItemStack stack : inputs) {
+		    CastType cast = new CastType(stack);
+		    Map<Fluid, CastingRecipe> fluidMap = basinCastRegistry.computeIfAbsent(cast, (o) -> {return new HashMap<Fluid, CastingRecipe>();});
+		    if (fluidMap.putIfAbsent(casting.getFluid().getFluid(), casting) != null) {
+			String output = Optional.ofNullable(recipe.getResult(ItemStack.EMPTY, FluidRegistry.WATER)).map(ItemStack::getUnlocalizedName).orElse("Unknown");
+			log.debug("Basin casting recipe for "+output+" failed due to preexisting recipe");
+		    }
+		}
+	    } else {
+		badBasinRegistry.add(recipe);
+	    }
 	}
 	else {
 	    try {
@@ -701,8 +721,16 @@ public final class TinkerRegistry {
     }
 
     public static ICastingRecipe getBasinCasting(ItemStack cast, Fluid fluid) {
-	for(ICastingRecipe recipe : basinCastRegistry) {
-	    if(recipe.matches(cast, fluid)) {
+	CastType castType = new CastType(cast);
+	Map<Fluid, CastingRecipe> fluidMap = basinCastRegistry.get(castType);
+	if (fluidMap != null) {
+	    CastingRecipe recipe = fluidMap.get(fluid);
+	    if (recipe != null) {
+		return recipe;
+	    }
+	}
+	for (ICastingRecipe recipe : badBasinRegistry) {
+	    if (recipe.matches(cast, fluid)) {
 		return recipe;
 	    }
 	}
@@ -710,7 +738,12 @@ public final class TinkerRegistry {
     }
 
     public static List<ICastingRecipe> getAllBasinCastingRecipes() {
-	return ImmutableList.copyOf(basinCastRegistry);
+	List<ICastingRecipe> recipes = new ArrayList<>();
+	for (Map<Fluid, CastingRecipe> fluidMap : basinCastRegistry.values()) {
+	    recipes.addAll(fluidMap.values());
+	}
+	recipes.addAll(badBasinRegistry);
+	return recipes;
     }
 
     /**
