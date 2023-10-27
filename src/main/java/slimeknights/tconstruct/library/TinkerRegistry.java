@@ -523,14 +523,15 @@ public final class TinkerRegistry {
   | Smeltery                                                                  |
   ---------------------------------------------------------------------------*/
   private static ArrayList<MeltingRecipe> meltingRegistry = new ArrayList<>();
-    private static Map<CastType, Map<Fluid, CastingRecipe>> tableCastRegistry = new HashMap<>();
+    private static Map<CastType, Map<Fluid, CastingRecipe>> newTableCastRegistry = new HashMap<>();
     private static ArrayList<ICastingRecipe> badTableRegistry = new ArrayList();
     private static Map<CastType, Map<Fluid, CastingRecipe>> basinCastRegistry = new HashMap<>();
     private static ArrayList<ICastingRecipe> badBasinRegistry = new ArrayList();
     private static ArrayList<AlloyRecipe> alloyRegistry = new ArrayList();
     private static Map<FluidStack, Integer> smelteryFuels = Maps.newHashMap();
     private static Map<ResourceLocation, FluidStack> entityMeltingRegistry = Maps.newHashMap();
-
+    private static List<ICastingRecipe> tableCastRegistry = null;
+    
     public static void postInit() {
 	stencilTableCrafting.trimToSize();
 	meltingRegistry.trimToSize();
@@ -639,7 +640,7 @@ public final class TinkerRegistry {
 		}
 		for (ItemStack stack : inputs) {
 		    CastType cast = new CastType(stack);
-		    Map<Fluid, CastingRecipe> fluidMap = tableCastRegistry.computeIfAbsent(cast, (o) -> {return new HashMap<Fluid, CastingRecipe>();});
+		    Map<Fluid, CastingRecipe> fluidMap = newTableCastRegistry.computeIfAbsent(cast, (o) -> {return new HashMap<Fluid, CastingRecipe>();});
 		    if (fluidMap.putIfAbsent(casting.getFluid().getFluid(), casting) != null) {
 			String output = Optional.ofNullable(recipe.getResult(ItemStack.EMPTY, FluidRegistry.WATER)).map(ItemStack::getUnlocalizedName).orElse("Unknown");
 			log.debug("Table casting recipe for "+output+" failed due to preexisting recipe");
@@ -661,7 +662,7 @@ public final class TinkerRegistry {
 
     public static ICastingRecipe getTableCasting(ItemStack cast, Fluid fluid) {
 	CastType castType = new CastType(cast);
-	Map<Fluid, CastingRecipe> fluidMap = tableCastRegistry.get(castType);
+	Map<Fluid, CastingRecipe> fluidMap = newTableCastRegistry.get(castType);
 	if (fluidMap != null) {
 	    CastingRecipe recipe = fluidMap.get(fluid);
 	    if (recipe != null) {
@@ -678,7 +679,7 @@ public final class TinkerRegistry {
 
     public static List<ICastingRecipe> getAllTableCastingRecipes() {
 	List<ICastingRecipe> recipes = new ArrayList<>();
-	for (Map<Fluid, CastingRecipe> fluidMap : tableCastRegistry.values()) {
+	for (Map<Fluid, CastingRecipe> fluidMap : newTableCastRegistry.values()) {
 	    recipes.addAll(fluidMap.values());
 	}
 	recipes.addAll(badTableRegistry);
