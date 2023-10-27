@@ -14,10 +14,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkCheckHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import slimeknights.mantle.common.GuiHandler;
 import slimeknights.mantle.pulsar.control.PulseManager;
+
 import slimeknights.tconstruct.common.ClientProxy;
 import slimeknights.tconstruct.common.CommonProxy;
 import slimeknights.tconstruct.common.TinkerNetwork;
@@ -27,6 +30,7 @@ import slimeknights.tconstruct.common.config.ConfigSync;
 import slimeknights.tconstruct.debug.TinkerDebug;
 import slimeknights.tconstruct.gadgets.TinkerGadgets;
 import slimeknights.tconstruct.library.Util;
+import slimeknights.tconstruct.library.TinkerRegistry;
 import slimeknights.tconstruct.library.book.TinkerBook;
 import slimeknights.tconstruct.library.capability.piggyback.CapabilityTinkerPiggyback;
 import slimeknights.tconstruct.library.capability.projectile.CapabilityTinkerProjectile;
@@ -168,7 +172,8 @@ public class TConstruct {
 
   @Mod.EventHandler
   public void postInit(FMLPostInitializationEvent event) {
-    if(event.getSide().isClient()) {
+      TinkerRegistry.postInit();
+      if(event.getSide().isClient()) {
       ClientProxy.initRenderer();
     }
     else {

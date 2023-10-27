@@ -337,7 +337,7 @@ public final class TinkerRegistry {
   private static final Set<IToolPart> toolParts = new TLinkedHashSet<>();
   private static final Set<ToolCore> toolStationCrafting = Sets.newLinkedHashSet();
   private static final Set<ToolCore> toolForgeCrafting = Sets.newLinkedHashSet();
-  private static final List<ItemStack> stencilTableCrafting = Lists.newLinkedList();
+    private static final ArrayList<ItemStack> stencilTableCrafting = new ArrayList<>();
   private static final Set<Item> patternItems = Sets.newHashSet();
   private static final Set<Item> castItems = Sets.newHashSet();
   private static Shard shardItem;
@@ -522,15 +522,22 @@ public final class TinkerRegistry {
   /*---------------------------------------------------------------------------
   | Smeltery                                                                  |
   ---------------------------------------------------------------------------*/
-  private static List<MeltingRecipe> meltingRegistry = Lists.newLinkedList();
+  private static ArrayList<MeltingRecipe> meltingRegistry = new ArrayList<>();
     private static Map<CastType, Map<Fluid, CastingRecipe>> tableCastRegistry = new HashMap<>();
-    private static List<ICastingRecipe> badTableRegistry = Lists.newLinkedList();
+    private static ArrayList<ICastingRecipe> badTableRegistry = new ArrayList();
     private static Map<CastType, Map<Fluid, CastingRecipe>> basinCastRegistry = new HashMap<>();
-    private static List<ICastingRecipe> badBasinRegistry = Lists.newLinkedList();
-    private static List<AlloyRecipe> alloyRegistry = Lists.newLinkedList();
+    private static ArrayList<ICastingRecipe> badBasinRegistry = new ArrayList();
+    private static ArrayList<AlloyRecipe> alloyRegistry = new ArrayList();
     private static Map<FluidStack, Integer> smelteryFuels = Maps.newHashMap();
     private static Map<ResourceLocation, FluidStack> entityMeltingRegistry = Maps.newHashMap();
 
+    public static void postInit() {
+	stencilTableCrafting.trimToSize();
+	meltingRegistry.trimToSize();
+	badTableRegistry.trimToSize();
+	badBasinRegistry.trimToSize();
+	alloyRegistry.trimToSize();
+    }
     /** Registers this item with all its metadatas to melt into amount of the given fluid. */
     public static void registerMelting(Item item, Fluid fluid, int amount) {
 	ItemStack stack = new ItemStack(item, 1, OreDictionary.WILDCARD_VALUE);
